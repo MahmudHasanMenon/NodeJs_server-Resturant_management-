@@ -13,6 +13,9 @@ var leaderRouter = require('./routes/leaderRouter');
 
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+var passport = require('passport');
+var authenticate = require('./authenticate');
+var config = require('./config');
 
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -20,7 +23,7 @@ mongoose.Promise = require('bluebird');
 const Dishes = require('./models/dishes');
 
 // Connection URL
-const url = 'mongodb://localhost:27017/conFusion';
+const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
     useMongoClient: true,
     /* other options */
@@ -32,13 +35,8 @@ connect.then((db) => {
 
 
 
-
-
-
-
-
-
 var app = express();
+ 
 
 
 // view engine setup
@@ -50,45 +48,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876-54321'));
 
-app.use(session({
-    name: 'session-id',
-    secret: '12345-67890-09876-54321',
-    saveUninitialized: false,
-    resave: false,
-    store: new FileStore()
-  }));
+ 
+  app.use(passport.initialize());
+ 
+
   app.use('/', indexRouter);
   app.use('/users', usersRouter);
 
-function auth (req, res, next) {
-    console.log(req.session);
-
-  if(!req.session.user) {
-      var err = new Error('You are not authenticated!');
-      err.status = 403;
-      return next(err);
-  }
-  else {
-    if (req.session.user === 'authenticated') {
-      next();
-    }
-    else {
-      var err = new Error('You are not authenticated!');
-      err.status = 403;
-      return next(err);
-    }
-  }
-}
-app.use(auth);
-
-
-
-
-
 app.use(express.static(path.join(__dirname, 'public')));
-
- 
-
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
