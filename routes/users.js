@@ -10,10 +10,16 @@ var authenticate = require('../authenticate');
 
  
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (request, response, next) => {
+  console.log('Getting all users...')
+  User.find({}, '_id username firstname lastname') // do not retrive the password and salt values.
+      .then((dbResponse) => {
+          response.statusCode = 200;
+          response.setHeader('Content-Type', 'application/json');
+          response.json(dbResponse);
+      }, (err) => next(err))
+      .catch((err) => next(err));
 });
-
  
 
 
