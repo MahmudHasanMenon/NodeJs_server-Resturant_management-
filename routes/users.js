@@ -4,13 +4,14 @@ const bodyParser = require('body-parser');
 var User = require('../models/user');
 var passport = require('passport');
 router.use(bodyParser.json());
+const cors = require('./cors');
 
 
 var authenticate = require('../authenticate');
 
  
 /* GET users listing. */
-router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (request, response, next) => {
+router.get('/',cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (request, response, next) => {
   console.log('Getting all users...')
   User.find({}, '_id username firstname lastname') // do not retrive the password and salt values.
       .then((dbResponse) => {
@@ -25,7 +26,7 @@ router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (request, res
 
 
 
-router.post('/signup', (req, res, next) => {
+router.post('/signup', cors.corsWithOptions,(req, res, next) => {
   User.register(new User({username: req.body.username}), 
     req.body.password, (err, user) => {
     if(err) {
@@ -55,7 +56,7 @@ router.post('/signup', (req, res, next) => {
   });
 });
 
-router.post('/login', passport.authenticate('local'), (req, res) => {
+router.post('/login',cors.corsWithOptions, passport.authenticate('local'), (req, res) => {
 
   var token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
