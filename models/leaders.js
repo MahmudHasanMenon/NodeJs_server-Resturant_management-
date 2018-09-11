@@ -35,7 +35,7 @@ var LeadersSchema = new Schema({
     },
      
     featured: {
-        type: Boolean,
+        type: String,
         default:false      
     },
       

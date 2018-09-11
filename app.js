@@ -23,6 +23,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
 const Dishes = require('./models/dishes');
+const cors = require('cors');
 
 // Connection URL
 const url = config.mongoUrl;
@@ -66,6 +67,7 @@ app.use(express.urlencoded({ extended: false }));
   app.use('/users', usersRouter);
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors({origin: 'http://localhost:4200'}));
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
